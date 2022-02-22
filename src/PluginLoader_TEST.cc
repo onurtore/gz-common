@@ -18,15 +18,36 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
-#include "ignition/common/PluginLoader.hh"
-#include "ignition/common/SystemPaths.hh"
+#include <fstream>
 
 #include "ignition/common/config.hh"
-#include "test_config.h"
+#include "ignition/common/PluginLoader.hh"
+#include "ignition/common/SystemPaths.hh"
+#include "ignition/common/TempDirectory.hh"
 
-#ifndef IGN_COMMON_LIB_PATH
-#define IGN_COMMON_LIB_PATH "./ign_common"
-#endif
+/////////////////////////////////////////////////
+class TestTempDirectory : public ignition::common::TempDirectory
+{
+  public: TestTempDirectory():
+    ignition::common::TempDirectory("plugin_loader", "ign_common", true)
+  {
+  }
+};
+
+/////////////////////////////////////////////////
+bool create_new_empty_file(const std::string &_filename)
+{
+  try
+  {
+    std::fstream fs(_filename, std::ios::out);
+  }
+  catch(...)
+  {
+    return false;
+  }
+  return true;
+}
+
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, InitialNoInterfacesImplemented)
@@ -45,20 +66,33 @@ TEST(PluginLoader, LoadNonexistantLibrary)
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadNonLibrary)
 {
-  std::string projectPath(IGN_COMMON_LIB_PATH);
+  TestTempDirectory tempDir;
+  create_new_empty_file("not_a_library.txt");
+
   ignition::common::PluginLoader pm;
-  EXPECT_TRUE(pm.LoadLibrary(projectPath + "/test_config.h").empty());
+  EXPECT_TRUE(pm.LoadLibrary("not_a_library.txt").empty());
 }
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadNonPluginLibrary)
 {
-  std::string libraryName("ignition-common");
-  libraryName += std::to_string(IGNITION_COMMON_MAJOR_VERSION);
+  std::string libDir = "lib_dir";
+  std::string libName = "foobar";
+
+  TestTempDirectory tempDir;
+  ignition::common::createDirectory(libDir);
+  create_new_empty_file(
+      ignition::common::joinPaths(libDir, "lib" + libName + ".so"));
 
   ignition::common::SystemPaths sp;
-  sp.AddPluginPaths(IGN_COMMON_LIB_PATH);
-  std::string path = sp.FindSharedLibrary(libraryName);
+
+  // Fails without plugin dirs setup
+  std::string path = sp.FindSharedLibrary("foo");
+  ASSERT_TRUE(path.empty());
+
+  sp.AddPluginPaths(
+      ignition::common::joinPaths(ignition::common::cwd(), libDir));
+  path = sp.FindSharedLibrary(libName);
   ASSERT_FALSE(path.empty());
 
   ignition::common::PluginLoader pm;

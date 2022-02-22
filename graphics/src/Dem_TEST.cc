@@ -20,7 +20,8 @@
 #include <ignition/math/Vector3.hh>
 
 #include "ignition/common/Dem.hh"
-#include "test_config.h"
+
+#include "ignition/common/testing/AutoLogFixture.hh"
 
 using namespace ignition;
 
