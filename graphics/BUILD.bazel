@@ -1,26 +1,20 @@
 load(
-    "//ign_bazel:build_defs.bzl",
+    "@ignition//tools/workspace:build_defs.bzl",
     "IGNITION_ROOT",
+    "IGNITION_FEATURES",
     "IGNITION_VISIBILITY",
-    "generate_include_header",
+    "ign_configure_header",
     "ign_export_header",
-)
-
-package(
-    default_visibility = IGNITION_VISIBILITY,
-    features = [
-        "-parse_headers",
-        "-layering_check",
-    ],
+    "ign_include_header"
 )
 
 public_headers_no_gen = glob([
     "include/ignition/common/*.hh",
-    "include/ignition/common/**/*.hh",
+    "include/ignition/common/graphics/*.hh",
 ])
 
 sources = glob(
-    ["src/*.cc"],
+    include = ["src/*.cc", "src/*.h"],
     exclude = ["src/*_TEST.cc"],
 )
 
@@ -33,8 +27,8 @@ ign_export_header(
     visibility = ["//visibility:private"],
 )
 
-generate_include_header(
-    name = "graphics_hh_genrule",
+ign_include_header(
+    name = "graphicshh_genrule",
     out = "include/ignition/common/graphics.hh",
     hdrs = public_headers_no_gen + [
         "include/ignition/common/graphics/Export.hh",
@@ -44,7 +38,6 @@ generate_include_header(
 public_headers = public_headers_no_gen + [
     "include/ignition/common/graphics/Export.hh",
     "include/ignition/common/graphics.hh",
-    "src/tiny_obj_loader.h",
 ]
 
 cc_library(
@@ -53,33 +46,28 @@ cc_library(
     hdrs = public_headers,
     includes = ["include"],
     deps = [
+        IGNITION_ROOT + "ign_common",
         "@freeimage",
         "@glib",
         "@gts",
-        "@tinyxml2",
-        IGNITION_ROOT + "ign_common",
-        IGNITION_ROOT + "ign_utils",
+        "@tinyxml2"
     ],
-)
-
-cc_binary(
-    name = "libignition-common5-graphics.so",
-    includes = ["include"],
-    linkopts = ["-Wl,-soname,libignition-common5-graphics.so"],
-    linkshared = True,
-    deps = [":graphics"],
+    visibility = ["//visibility:public"],
 )
 
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
-    data = [
-        IGNITION_ROOT + "ign_common/test:data",
-    ],
     deps = [
         ":graphics",
-        IGNITION_ROOT + "ign_common/test:test_utils",
+        IGNITION_ROOT + "ign_common:test_data",
+        IGNITION_ROOT + "ign_common/testing",
         "@gtest",
         "@gtest//:gtest_main",
     ],
+    env = {
+        "IGN_BAZEL": "1",
+        "IGN_BAZEL_PATH": "ign_common"
+    },
 ) for src in test_sources]
+

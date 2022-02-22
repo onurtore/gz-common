@@ -1,11 +1,11 @@
 load(
-    "//ign_bazel:build_defs.bzl",
-    "IGNITION_FEATURES",
+    "@ignition//tools/workspace:build_defs.bzl",
     "IGNITION_ROOT",
+    "IGNITION_FEATURES",
     "IGNITION_VISIBILITY",
-    "generate_include_header",
-    "ign_config_header",
+    "ign_configure_header",
     "ign_export_header",
+    "ign_include_header"
 )
 
 package(
@@ -13,25 +13,13 @@ package(
     features = IGNITION_FEATURES,
 )
 
-licenses(["notice"])
+licenses(["notice"]) # Apache-2.0
 
-exports_files(["LICENSE"])
-
-PROJECT_NAME = "ignition-common"
-
-PROJECT_MAJOR = 5
-
-PROJECT_MINOR = 0
-
-PROJECT_PATCH = 0
-
-# Generates config.hh based on the version numbers in CMake code.
-ign_config_header(
+ign_configure_header(
     name = "config",
+    package = "ign_common",
     src = "include/ignition/common/config.hh.in",
     cmakelists = ["CMakeLists.txt"],
-    project_name = PROJECT_NAME,
-    project_version = (PROJECT_MAJOR, PROJECT_MINOR, PROJECT_PATCH),
 )
 
 ign_export_header(
@@ -41,22 +29,25 @@ ign_export_header(
     visibility = ["//visibility:private"],
 )
 
-public_headers_no_gen = glob([
-    "include/ignition/common/*.hh",
-    "include/ignition/common/detail/*.hh",
-])
-
-private_headers = [
-    "src/PluginUtils.hh",
-    "src/PrintWindowsSystemWarning.hh",
-]
-
-sources = glob(
-    ["src/*.cc"],
-    exclude = ["src/*_TEST.cc"],
+public_headers_no_gen = glob(
+    include = [
+        "include/ignition/common/*.hh",
+        "include/ignition/common/detail/*.hh",
+    ],
 )
 
-generate_include_header(
+private_headers = glob(["src/*.hh"])
+
+sources = glob(
+    include = ["src/*.cc"],
+    exclude = ["src/*_TEST.cc", "src/**/*_TEST.cc"],
+)
+
+test_sources = glob(
+    include = ["src/*_TEST.cc"],
+)
+
+ign_include_header(
     name = "commonhh_genrule",
     out = "include/ignition/common.hh",
     hdrs = public_headers_no_gen + [
@@ -83,28 +74,19 @@ cc_library(
     ],
 )
 
-cc_binary(
-    name = "libignition-common5.so",
-    includes = ["include"],
-    linkopts = ["-Wl,-soname,libignition-common5.so"],
-    linkshared = True,
-    deps = [":ign_common"],
-)
-
-test_srcs = glob(
-    ["src/*_TEST.cc"],
-    exclude = ["src/PluginLoader_TEST.cc"],
+cc_library(
+    name = "test_data",
+    data = ["test/data"]
 )
 
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
-    data = [":libignition-common5.so"],
     deps = [
         ":ign_common",
-        IGNITION_ROOT + "ign_bazel:utilities",
-        IGNITION_ROOT + "ign_common/test:test_utils",
+        IGNITION_ROOT + "ign_common/testing",
         "@gtest",
         "@gtest//:gtest_main",
     ],
-) for src in test_srcs]
+) for src in test_sources]
+

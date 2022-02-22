@@ -1,30 +1,21 @@
 load(
-    "//ign_bazel:build_defs.bzl",
+    "@ignition//tools/workspace:build_defs.bzl",
     "IGNITION_ROOT",
+    "IGNITION_FEATURES",
     "IGNITION_VISIBILITY",
-    "generate_include_header",
+    "ign_configure_header",
     "ign_export_header",
-)
-
-package(
-    default_visibility = IGNITION_VISIBILITY,
-    features = [
-        "-parse_headers",
-        "-layering_check",
-    ],
+    "ign_include_header"
 )
 
 public_headers_no_gen = glob([
     "include/ignition/common/*.hh",
-    "include/ignition/common/**/*.hh",
+    "include/ignition/common/av/*.hh",
 ])
 
 sources = glob(
     ["src/*.cc"],
-    exclude = [
-        "src/*_TEST.cc",
-        "src/HWEncoder.cc",
-    ],
+    exclude = ["src/*_TEST.cc"],
 )
 
 test_sources = glob(["src/*_TEST.cc"])
@@ -36,8 +27,8 @@ ign_export_header(
     visibility = ["//visibility:private"],
 )
 
-generate_include_header(
-    name = "eventshh_genrule",
+ign_include_header(
+    name = "avhh_genrule",
     out = "include/ignition/common/av.hh",
     hdrs = public_headers_no_gen + [
         "include/ignition/common/av/Export.hh",
@@ -64,25 +55,19 @@ cc_library(
     ],
 )
 
-cc_binary(
-    name = "libignition-common5-av.so",
-    includes = ["include"],
-    linkopts = ["-Wl,-soname,libignition-common5-av.so"],
-    linkshared = True,
-    deps = [":av"],
-)
-
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
-    data = [
-        IGNITION_ROOT + "ign_common/test:data",
-    ],
     deps = [
         ":av",
-        IGNITION_ROOT + "ign_common/test:test_utils",
-        IGNITION_ROOT + "ign_bazel:utilities",
+        IGNITION_ROOT + "ign_common:test_data",
+        IGNITION_ROOT + "ign_common/testing",
         "@gtest",
         "@gtest//:gtest_main",
     ],
+    env = {
+        "IGN_BAZEL": "1",
+        "IGN_BAZEL_PATH": "ign_common"
+    },
 ) for src in test_sources]
+
