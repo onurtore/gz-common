@@ -1,15 +1,15 @@
 load(
     "@ignition//tools/workspace:build_defs.bzl",
-    "IGNITION_ROOT",
     "IGNITION_FEATURES",
+    "IGNITION_ROOT",
     "IGNITION_VISIBILITY",
     "ign_configure_header",
     "ign_export_header",
-    "ign_include_header"
+    "ign_include_header",
 )
 load(
     "@ignition//tools/lint:lint.bzl",
-    "add_lint_tests"
+    "add_lint_tests",
 )
 
 public_headers_no_gen = glob([
@@ -49,10 +49,10 @@ cc_library(
     srcs = sources,
     hdrs = public_headers,
     includes = ["include"],
+    visibility = IGNITION_VISIBILITY,
     deps = [
         IGNITION_ROOT + "ign_common",
     ],
-    visibility = IGNITION_VISIBILITY,
 )
 
 [cc_test(

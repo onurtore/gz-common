@@ -1,11 +1,11 @@
 load(
     "@ignition//tools/workspace:build_defs.bzl",
-    "IGNITION_ROOT",
     "IGNITION_FEATURES",
+    "IGNITION_ROOT",
     "IGNITION_VISIBILITY",
     "ign_configure_header",
     "ign_export_header",
-    "ign_include_header"
+    "ign_include_header",
 )
 load(
     "@ignition//tools/lint:lint.bzl",
@@ -17,13 +17,13 @@ package(
     features = IGNITION_FEATURES,
 )
 
-licenses(["notice"]) # Apache-2.0
+licenses(["notice"])  # Apache-2.0
 
 ign_configure_header(
     name = "config",
-    package = "ign_common",
     src = "include/ignition/common/config.hh.in",
     cmakelists = ["CMakeLists.txt"],
+    package = "ign_common",
 )
 
 ign_export_header(
@@ -44,7 +44,10 @@ private_headers = glob(["src/*.hh"])
 
 sources = glob(
     include = ["src/*.cc"],
-    exclude = ["src/*_TEST.cc", "src/**/*_TEST.cc"],
+    exclude = [
+        "src/*_TEST.cc",
+        "src/**/*_TEST.cc",
+    ],
 )
 
 test_sources = glob(
@@ -80,7 +83,7 @@ cc_library(
 
 cc_library(
     name = "test_data",
-    data = ["test/data"]
+    data = ["test/data"],
 )
 
 [cc_test(

@@ -1,15 +1,15 @@
 load(
     "@ignition//tools/workspace:build_defs.bzl",
-    "IGNITION_ROOT",
     "IGNITION_FEATURES",
+    "IGNITION_ROOT",
     "IGNITION_VISIBILITY",
     "ign_configure_header",
     "ign_export_header",
-    "ign_include_header"
+    "ign_include_header",
 )
 load(
     "@ignition//tools/lint:lint.bzl",
-    "add_lint_tests"
+    "add_lint_tests",
 )
 
 public_headers_no_gen = glob([
@@ -18,7 +18,10 @@ public_headers_no_gen = glob([
 ])
 
 sources = glob(
-    include = ["src/*.cc", "src/*.h"],
+    include = [
+        "src/*.cc",
+        "src/*.h",
+    ],
     exclude = ["src/*_TEST.cc"],
 )
 
@@ -49,19 +52,23 @@ cc_library(
     srcs = sources,
     hdrs = public_headers,
     includes = ["include"],
+    visibility = ["//visibility:public"],
     deps = [
         IGNITION_ROOT + "ign_common",
         "@freeimage",
         "@glib",
         "@gts",
-        "@tinyxml2"
+        "@tinyxml2",
     ],
-    visibility = ["//visibility:public"],
 )
 
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
+    env = {
+        "IGN_BAZEL": "1",
+        "IGN_BAZEL_PATH": "ign_common",
+    },
     deps = [
         ":graphics",
         IGNITION_ROOT + "ign_common:test_data",
@@ -69,10 +76,6 @@ cc_library(
         "@gtest",
         "@gtest//:gtest_main",
     ],
-    env = {
-        "IGN_BAZEL": "1",
-        "IGN_BAZEL_PATH": "ign_common"
-    },
 ) for src in test_sources]
 
 add_lint_tests()

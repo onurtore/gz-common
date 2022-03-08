@@ -1,16 +1,16 @@
 load(
     "@ignition//tools/workspace:build_defs.bzl",
-    "IGNITION_ROOT",
     "IGNITION_FEATURES",
+    "IGNITION_ROOT",
     "IGNITION_VISIBILITY",
+    "cmake_configure_file",
     "ign_configure_header",
     "ign_export_header",
     "ign_include_header",
-    "cmake_configure_file"
 )
 load(
     "@ignition//tools/lint:lint.bzl",
-    "add_lint_tests"
+    "add_lint_tests",
 )
 
 public_headers_no_gen = glob([
@@ -21,7 +21,6 @@ sources = glob(
     ["src/*.cc"],
     exclude = ["src/*_TEST.cc"],
 )
-
 
 test_sources = glob(["src/*_TEST.cc"])
 
@@ -42,7 +41,7 @@ cmake_configure_file(
 )
 
 private_headers = glob(
-    ["src/*.hh"]
+    ["src/*.hh"],
 )
 
 ign_export_header(
@@ -74,18 +73,18 @@ cc_library(
 
 cc_library(
     name = "profiler",
-    srcs = sources + private_headers + ["include/RemoteryConfig.h"], 
+    srcs = sources + private_headers + ["include/RemoteryConfig.h"],
     hdrs = public_headers,
-    includes = ["include"],
     defines = [
         "IGN_PROFILER_ENABLE=1",
         "IGN_PROFILER_REMOTERY=1",
     ],
+    includes = ["include"],
+    visibility = IGNITION_VISIBILITY,
     deps = [
         ":remotery",
         IGNITION_ROOT + "ign_common",
     ],
-    visibility = IGNITION_VISIBILITY,
 )
 
 cc_test(
