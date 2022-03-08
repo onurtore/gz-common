@@ -7,6 +7,10 @@ load(
     "ign_export_header",
     "ign_include_header"
 )
+load(
+    "@ignition//tools/lint:lint.bzl",
+    "add_lint_tests"
+)
 
 public_headers_no_gen = glob([
     "include/ignition/common/*.hh",
@@ -62,4 +66,4 @@ cc_library(
     ],
 ) for src in test_sources]
 
-
+add_lint_tests()
