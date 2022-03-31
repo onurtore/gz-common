@@ -44,6 +44,8 @@ TEST(URI, TrivialError)
   std::ifstream t(logFile);
   std::string buffer((std::istreambuf_iterator<char>(t)),
                  std::istreambuf_iterator<char>());
-  EXPECT_TRUE(buffer.find("A host is mandatory when") != std::string::npos)
+
+  // Note that none of us can spell
+  EXPECT_TRUE(buffer.find("A host is manadatory when") != std::string::npos)
     << "Log file content[" << buffer << "]\n";
 }
