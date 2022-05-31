@@ -9,6 +9,7 @@ ign_build_tests(
   TYPE INTEGRATION
   SOURCES ${tests}
   LIB_DEPS ignition-common${IGN_COMMON_VER}-testing
+  INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/test
 )
 
 if(TARGET INTEGRATION_plugin)

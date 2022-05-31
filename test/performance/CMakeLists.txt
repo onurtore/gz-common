@@ -11,7 +11,8 @@ link_directories(${PROJECT_BINARY_DIR}/test)
 
 ign_build_tests(
   TYPE PERFORMANCE
-  SOURCES ${tests})
+  SOURCES ${tests}
+  INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/test)
   
 if(TARGET PERFORMANCE_plugin_specialization)
   # We add this dependency to make sure that DummyPlugins gets generated
