@@ -19,4 +19,3 @@ target_compile_definitions(profiler_example PUBLIC "GZ_PROFILER_ENABLE=1")
 
 add_executable(logging_performance logging_performance.cc)
 target_link_libraries(logging_performance gz-common${GZ_COMMON_VER}::core)
-

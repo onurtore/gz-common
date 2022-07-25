@@ -267,6 +267,10 @@ namespace gz
           const Mesh *_m2, const int _operation,
           const gz::math::Pose3d &_offset = gz::math::Pose3d::Zero);
 
+      /// \brief Set the assimp mode
+      /// \param[in] _useAssimp Set to true to enable assimp mode.
+      public: void SetUseAssimp(const bool _useAssimp);
+
       /// \brief Converts a vector of polylines into a table of vertices and
       /// a list of edges (each made of 2 points from the table of vertices.
       /// \param[in] _polys the polylines
