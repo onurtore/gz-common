@@ -440,6 +440,7 @@ TEST_F(AssimpLoader, LoadBoxWithHierarchicalNodes)
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, MergeBoxWithDoubleSkeleton)
 {
+  common::setenv("GZ_MESH_REMOVE_SCENE", "false");
   common::AssimpLoader loader;
   common::Mesh *mesh = loader.Load(
       common::testing::TestFile("data", "box_with_double_skeleton.dae"));
@@ -447,7 +448,7 @@ TEST_F(AssimpLoader, MergeBoxWithDoubleSkeleton)
   auto skeleton_ptr = mesh->MeshSkeleton();
   // The two skeletons have been joined and their root is the
   // animation root, called Scene
-  EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string("Scene"));
+  EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string("Armature_Bone"));
 }
 
 // For assimp below 5.2.0 mesh loading fails because of

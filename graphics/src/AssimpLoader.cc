@@ -155,6 +155,10 @@ class AssimpLoader::Implementation
   /// calculated from the "old" parent model transform.
   /// \param[in] _skeleton the skeleton to work on
   public: void ApplyInvBindTransform(SkeletonPtr _skeleton) const;
+
+  public: void SetRemoveSceneEnv();
+
+  public: bool removeSceneEnv;
 };
 
 //////////////////////////////////////////////////
@@ -728,6 +732,20 @@ void AssimpLoader::Implementation::ApplyInvBindTransform(
       queue.push(node->Child(i));
   }
 }
+
+//////////////////////////////////////////////////
+void AssimpLoader::Implementation::SetRemoveSceneEnv()
+{
+  std::string removeSceneEnv;
+  common::env("GZ_MESH_REMOVE_SCENE", removeSceneEnv);
+  this->removeSceneEnv = false;
+  if (removeSceneEnv == "true")
+  {
+    gzmsg << "Removing scene root node" << std::endl;
+    this->removeSceneEnv = true;
+  }
+}
+
 
 }
 }
