@@ -163,6 +163,9 @@ class AssimpLoader::Implementation
 
   /// \brief True if scene node is removed from the skeleton
   public: bool removeScene;
+
+  /// \brief 3D mesh loader for Assimp assets (others)
+  public: AssimpLoader assimpLoader;
 };
 
 //////////////////////////////////////////////////
