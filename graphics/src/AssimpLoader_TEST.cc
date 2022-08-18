@@ -167,6 +167,34 @@ TEST_F(AssimpLoader, LoadZeroCount)
 }
 
 /////////////////////////////////////////////////
+TEST_F(AssimpLoader, CheckNoneRootXDisplacement)
+{
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(common::testing::TestFile("data",
+        "walk.dae"));
+  auto meshSkel =  mesh->MeshSkeleton();
+  std::string rootNodeName = meshSkel->RootNode()->Name();
+  common::SkeletonAnimation *skelAnim = meshSkel->Animation(0);
+  common::NodeAnimation *rootNode = skelAnim->NodeAnimationByName(rootNodeName);
+  EXPECT_EQ(nullptr, rootNode);
+  auto xDisplacement = skelAnim->XDisplacement();
+  ASSERT_TRUE(xDisplacement);
+}
+
+/////////////////////////////////////////////////
+TEST_F(AssimpLoader, LoadBvhAnimation)
+{
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(common::testing::TestFile("data",
+        "walk.dae"));
+  auto meshSkel =  mesh->MeshSkeleton();
+  auto success = meshSkel->AddBvhAnimation(common::testing::TestFile("data",
+        "gesture.bvh"), 0.055);
+  ASSERT_TRUE(success);
+  return;
+}
+
+/////////////////////////////////////////////////
 TEST_F(AssimpLoader, TexCoordSets)
 {
   common::AssimpLoader loader;
